@@ -61,7 +61,17 @@
       border: 0;
       background: var(--bg);
     }
-
+@media (max-width:640px){
+  .filters{
+    display:block !important;  /* stack items vertically */
+  }
+  .filters select{
+    width:100% !important;
+    display:block;
+    margin-bottom:10px;
+  }
+  .filters select:last-child{ margin-bottom:0; }
+}
     /* Fallback mini header shown only if iframe fails */
     .fallback {
       position: absolute;
