@@ -2,106 +2,120 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Mobile-first viewport + safe-area + no zoom -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
+
   <title>Alkady Car Gallery</title>
 
+  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#2563eb" />
 
+  <!-- iOS PWA -->
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <style>
-    html,body{height:100%;margin:0;background:#F4F6FA}
-    .app{height:100%;display:flex;flex-direction:column}
-    .app header{padding:8px 12px;font-weight:700;font-family:system-ui;background:#fff;
-                border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px}
-    .brand{height:22px}
-    iframe{flex:1;border:0;width:100%;height:100%}
-<style>
-  :root{
-    --pad:12px; --gap:10px; --brand:#2563eb;
-    --radius:14px; --shadow:0 4px 16px rgba(0,0,0,.06);
-  }
-  html,body{height:100%;margin:0;background:#F4F6FA}
-  body{font:15px system-ui,-apple-system,Segoe UI,Roboto,Arial}
-
-  /* container */
-  .wrap{max-width:1100px;margin:0 auto;padding:var(--pad)}
-
-  /* sticky actions on mobile */
-  .toolbar{
-    display:flex;gap:8px;flex-wrap:wrap;
-    background:#fff;border-radius:var(--radius);
-    padding:8px; box-shadow:var(--shadow);
-  }
-  @media (max-width:640px){
-    .toolbar{
-      position:sticky; top:0; z-index:30;
-      padding:10px var(--pad); margin:0 calc(-1*var(--pad)) 10px;
-      border-radius:0;
+    :root{
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+      --bg: #F4F6FA;
     }
-  }
+    /* mobile-app style full-bleed container */
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: #0f172a;
+      font: 15px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+    .app {
+      position: fixed;
+      inset: 0;
+      /* make room for notches */
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+      background: var(--bg);
+    }
+    /* use modern viewport to avoid address bar jumps */
+    .stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100dvh; /* modern mobile viewport */
+      background: var(--bg);
+    }
+    iframe {
+      display: block;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: var(--bg);
+    }
 
-  /* filter row as grid */
-  .filters{
-    display:grid; gap:var(--gap);
-    grid-template-columns:1fr 1fr 1fr;
-    margin:10px 0;
-  }
-  @media (max-width:900px){ .filters{grid-template-columns:1fr 1fr;} }
-  @media (max-width:640px){ .filters{grid-template-columns:1fr;} }
-
-  select,.btn{
-    height:44px; border:1px solid #dbe2ea; background:#fff;
-    border-radius:12px; padding:0 12px; font-size:15px;
-  }
-  .btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; cursor:pointer}
-  .btn.primary{background:var(--brand); color:#fff; border-color:var(--brand)}
-  .btn:disabled{opacity:.5; cursor:not-allowed}
-
-  /* list cards */
-  .card{
-    display:grid; grid-template-columns:80px 1fr auto; align-items:center;
-    gap:12px; padding:12px; margin:10px 0;
-    background:#fff; border-radius:18px; box-shadow:var(--shadow);
-  }
-  @media (max-width:640px){ .card{grid-template-columns:72px 1fr 84px;} }
-
-  .thumb{
-    width:72px;height:72px;border-radius:12px;object-fit:cover;background:#eef2f7
-  }
-  .title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .sub{color:#6b7280;font-size:13px}
-  .viewBtn{min-width:80px}
-
-  /* small helper */
-  .spinner{display:inline-block;width:16px;height:16px;border:2px solid #cbd5e1;border-top-color:#2563eb;border-radius:50%;animation:spin 1s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-</style>
-
+    /* Fallback mini header shown only if iframe fails */
+    .fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      color: #475569;
+    }
+    .fallback.show { display: flex; }
+    .fallback a { color:#2563eb; text-decoration:none; font-weight:700; }
   </style>
 </head>
+
 <body>
   <div class="app">
-    <header>
-      <img src="./icons/icon-192.png" class="brand" alt="Alkady Logo"/>
-      Alkady Car Gallery
-    </header>
-    <iframe
-      src="https://script.google.com/macros/s/AKfycbyA2Fo14EEhTUM53TGBKpVE3cTPV93rmK8icplq7bPp-zRVEzi014cTn9Rnms5dSHiKZg/exec"
-      allow="clipboard-write; encrypted-media; fullscreen"
-      referrerpolicy="no-referrer-when-downgrade"
-    ></iframe>
+    <div class="stage">
+      <iframe id="appframe"
+        src="https://script.google.com/macros/s/AKfycbyA2Fo14EEhTUM53TGBKpVE3cTPV93rmK8icplq7bPp-zRVEzi014cTn9Rnms5dSHiKZg/exec"
+        allow="clipboard-write; encrypted-media; fullscreen"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+
+      <!-- shown if iframe fails to load -->
+      <div id="fallback" class="fallback">
+        <div>
+          <p>Loading… If nothing appears, open directly:</p>
+          <p>
+            <a href="https://script.google.com/macros/s/AKfycbyA2Fo14EEhTUM53TGBKpVE3cTPV93rmK8icplq7bPp-zRVEzi014cTn9Rnms5dSHiKZg/exec"
+               target="_blank" rel="noopener">Open Alkady Car Gallery</a>
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
+    // PWA service worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(console.error);
       });
     }
+
+    // Simple iframe failure fallback (network/CSP)
+    (function setupFallback(){
+      const iframe = document.getElementById('appframe');
+      const fb = document.getElementById('fallback');
+      // If load doesn't fire within 12s, show fallback
+      let timer = setTimeout(()=> fb.classList.add('show'), 12000);
+      iframe.addEventListener('load', () => clearTimeout(timer), { once:true });
+    })();
   </script>
 </body>
 </html>
