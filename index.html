@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alkady Car Gallery</title>
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#2563eb" />
+
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <style>
+    html,body{height:100%;margin:0;background:#F4F6FA}
+    .app{height:100%;display:flex;flex-direction:column}
+    .app header{padding:8px 12px;font-weight:700;font-family:system-ui;background:#fff;
+                border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px}
+    .brand{height:22px}
+    iframe{flex:1;border:0;width:100%;height:100%}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <img src="./icons/icon-192.png" class="brand" alt="Alkady Logo"/>
+      Alkady Car Gallery
+    </header>
+    <iframe
+      src="https://script.google.com/macros/s/AKfycbyA2Fo14EEhTUM53TGBKpVE3cTPV93rmK8icplq7bPp-zRVEzi014cTn9Rnms5dSHiKZg/exec"
+      allow="clipboard-write; encrypted-media; fullscreen"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
+      });
+    }
+  </script>
+</body>
+</html>
