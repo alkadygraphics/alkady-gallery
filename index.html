@@ -1,131 +1,238 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-
-  <!-- Mobile-first viewport + safe-area + no zoom -->
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
-
+  <meta charset="utf-8">
   <title>Alkady Car Gallery</title>
-
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#2563eb" />
-
-  <!-- iOS PWA -->
-  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
   <style>
     :root{
-      --safe-top: env(safe-area-inset-top);
-      --safe-bottom: env(safe-area-inset-bottom);
-      --bg: #F4F6FA;
+      --bg:#F4F6FA; --card:#fff; --text:#0f172a; --muted:#6b7280;
+      --brand:#2563eb; --radius:16px; --shadow:0 6px 20px rgba(15,23,42,.06);
+      --safe-b: env(safe-area-inset-bottom); --safe-t: env(safe-area-inset-top);
     }
-    /* mobile-app style full-bleed container */
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: var(--bg);
-      color: #0f172a;
-      font: 15px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      -webkit-tap-highlight-color: transparent;
-      overscroll-behavior: none;
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);
+      font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+    /* TOP BAR */
+    .appbar{
+      position:sticky; top:0; z-index:50; height:56px;
+      display:flex; align-items:center; padding:0 16px;
+      background:#fff; border-bottom:1px solid #eef2f7;
+      font-weight:700; font-size:17px;
     }
-    .app {
-      position: fixed;
-      inset: 0;
-      /* make room for notches */
-      padding-top: var(--safe-top);
-      padding-bottom: var(--safe-bottom);
-      background: var(--bg);
+
+    /* CONTENT */
+    .wrap{padding:12px 12px calc(90px + var(--safe-b)); max-width:600px; margin:0 auto;}
+
+    /* filters */
+    .filters{display:grid; gap:10px; grid-template-columns:1fr}
+    select{
+      height:48px; border:1px solid #dde6ee; border-radius:14px;
+      padding:0 12px; font-size:15px; background:#fff;
     }
-    /* use modern viewport to avoid address bar jumps */
-    .stage {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100dvh; /* modern mobile viewport */
-      background: var(--bg);
+    select:disabled{opacity:.6}
+
+    /* status */
+    #status{margin:10px 2px; color:var(--muted)}
+
+    /* photo cards */
+    .card{
+      display:grid; grid-template-columns:92px 1fr 88px; align-items:center;
+      gap:12px; padding:12px; margin:10px 0;
+      background:var(--card); border-radius:18px; box-shadow:var(--shadow);
     }
-    iframe {
-      display: block;
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: var(--bg);
+    .thumb{width:92px;height:92px;border-radius:14px;object-fit:cover;background:#eef2f7}
+    .meta .title{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta .sub{color:var(--muted);font-size:13px}
+    .btn{height:42px;padding:0 14px;border:1px solid #d5dfeb;border-radius:12px;background:#fff;font-weight:600}
+    .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .viewBtn{min-width:80px}
+
+    /* bottom action bar (folder level) */
+    .bottombar{
+      position:fixed; left:0; right:0; bottom:0; z-index:60;
+      background:#fff; border-top:1px solid #e9eef5;
+      padding:8px 10px calc(8px + var(--safe-b));
     }
-@media (max-width:640px){
-  .filters{
-    display:block !important;  /* stack items vertically */
-  }
-  .filters select{
-    width:100% !important;
-    display:block;
-    margin-bottom:10px;
-  }
-  .filters select:last-child{ margin-bottom:0; }
-}
-    /* Fallback mini header shown only if iframe fails */
-    .fallback {
-      position: absolute;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 24px;
-      color: #475569;
-    }
-    .fallback.show { display: flex; }
-    .fallback a { color:#2563eb; text-decoration:none; font-weight:700; }
+    .tabs{max-width:600px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .tab{height:48px;border:1px solid #d5dfeb;border-radius:12px;background:#fff;
+         display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700}
+    .tab.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid #cbd5e1;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
-
 <body>
-  <div class="app">
-    <div class="stage">
-      <iframe id="appframe"
-        src="https://script.google.com/macros/s/AKfycbyA2Fo14EEhTUM53TGBKpVE3cTPV93rmK8icplq7bPp-zRVEzi014cTn9Rnms5dSHiKZg/exec"
-        allow="clipboard-write; encrypted-media; fullscreen"
-        referrerpolicy="no-referrer-when-downgrade"
-      ></iframe>
+  <div class="appbar">Alkady Car Gallery</div>
 
-      <!-- shown if iframe fails to load -->
-      <div id="fallback" class="fallback">
-        <div>
-          <p>Loading… If nothing appears, open directly:</p>
-          <p>
-            <a href="https://script.google.com/macros/s/AKfycbyA2Fo14EEhTUM53TGBKpVE3cTPV93rmK8icplq7bPp-zRVEzi014cTn9Rnms5dSHiKZg/exec"
-               target="_blank" rel="noopener">Open Alkady Car Gallery</a>
-          </p>
-        </div>
-      </div>
+  <div class="wrap">
+    <!-- filters -->
+    <div class="filters">
+      <select id="makeSel"></select>
+      <select id="modelSel" disabled></select>
+      <select id="yearSel"  disabled></select>
     </div>
+
+    <div id="status">Loading photos…</div>
+    <div id="list"></div>
   </div>
 
+  <!-- bottom folder actions -->
+  <nav class="bottombar" id="toolbar" style="display:none">
+    <div class="tabs">
+      <a id="shareAllBtn" class="tab"   target="_blank" rel="noopener">🟢 Share</a>
+      <a id="emailAllBtn" class="tab"   rel="noopener">✉️ Email</a>
+      <button id="copyLinkBtn" class="tab" type="button">🔗 Copy</button>
+      <button id="pdfBtn"      class="tab primary" type="button">📄 PDF</button>
+    </div>
+  </nav>
+
   <script>
-    // PWA service worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(console.error);
+    /* ===== helpers ===== */
+    const makeSel  = document.getElementById('makeSel');
+    const modelSel = document.getElementById('modelSel');
+    const yearSel  = document.getElementById('yearSel');
+    const listEl   = document.getElementById('list');
+    const selLabel = document.getElementById('status');
+    const toolbar  = document.getElementById('toolbar');
+    const shareAllBtn = document.getElementById('shareAllBtn');
+    const emailAllBtn = document.getElementById('emailAllBtn');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    const pdfBtn      = document.getElementById('pdfBtn');
+
+    const say = t => selLabel.textContent = t;
+
+    function optionize(sel, items, placeholder){
+      sel.innerHTML = '';
+      const ph = document.createElement('option');
+      ph.value = ''; ph.textContent = placeholder; ph.disabled = true; ph.selected = true;
+      sel.appendChild(ph);
+      items.forEach(it=>{
+        const o = document.createElement('option');
+        o.value = it.id; o.textContent = it.name;
+        sel.appendChild(o);
       });
     }
 
-    // Simple iframe failure fallback (network/CSP)
-    (function setupFallback(){
-      const iframe = document.getElementById('appframe');
-      const fb = document.getElementById('fallback');
-      // If load doesn't fire within 12s, show fallback
-      let timer = setTimeout(()=> fb.classList.add('show'), 12000);
-      iframe.addEventListener('load', () => clearTimeout(timer), { once:true });
-    })();
+    function setBusy(btn, labelBusy, normal='📄 PDF'){
+      btn.disabled = true; btn.classList.add('primary');
+      btn.innerHTML = '<span class="spinner"></span>&nbsp;' + labelBusy;
+      return () => { btn.disabled = false; btn.innerHTML = normal; };
+    }
+
+    /* ===== render list ===== */
+    function render(items, heading){
+      listEl.innerHTML = '';
+      if(!items || !items.length){
+        const d = document.createElement('div');
+        d.className='meta sub'; d.textContent='No photos';
+        listEl.appendChild(d); return;
+      }
+      items.forEach(it=>{
+        const card = document.createElement('div'); card.className='card';
+
+        const img = document.createElement('img');
+        img.className='thumb'; img.loading='lazy';
+        const urls = [it.thumb, it.raw, it.view].filter(Boolean);
+        let idx=0; img.src = urls[idx];
+        img.onerror = ()=>{ if(++idx < urls.length) img.src = urls[idx]; };
+
+        const meta = document.createElement('div'); meta.className='meta';
+        meta.innerHTML = `<div class="title">${heading||it.name}</div><div class="sub">${it.name||''}</div>`;
+
+        const view = document.createElement('a');
+        view.className='btn viewBtn'; view.textContent='View';
+        view.href = it.view || it.raw || it.thumb; view.target='_blank'; view.rel='noopener';
+
+        card.appendChild(img); card.appendChild(meta); card.appendChild(view);
+        listEl.appendChild(card);
+      });
+    }
+
+    /* ===== filters flow ===== */
+    function boot(){
+      google.script.run
+        .withSuccessHandler(makes=>{
+          optionize(makeSel, makes, 'Make');
+          say('Makes loaded: ' + makes.length);
+        })
+        .withFailureHandler(e=> say('getMakes error: ' + e.message))
+        .getMakes();
+    }
+
+    makeSel.addEventListener('change', ()=>{
+      const makeId = makeSel.value; if(!makeId) return;
+      modelSel.disabled = true; yearSel.disabled = true; toolbar.style.display='none';
+      say('Loading models…');
+      google.script.run
+        .withSuccessHandler(models=>{
+          optionize(modelSel, models, 'Model');
+          modelSel.disabled = false;
+          say('Select model');
+        })
+        .withFailureHandler(e=> say('getModels error: ' + e.message))
+        .getModels(makeId);
+    });
+
+    modelSel.addEventListener('change', ()=>{
+      const makeId = makeSel.value; const modelId = modelSel.value; if(!modelId) return;
+      yearSel.disabled = true; toolbar.style.display='none';
+      say('Loading years…');
+      google.script.run
+        .withSuccessHandler(years=>{
+          optionize(yearSel, years, 'Year');
+          yearSel.disabled = false;
+          say('Select year');
+        })
+        .withFailureHandler(e=> say('getYears error: ' + e.message))
+        .getYears(makeId, modelId);
+    });
+
+    yearSel.addEventListener('change', ()=>{
+      const makeId = makeSel.value, modelId = modelSel.value, yearId = yearSel.value; if(!yearId) return;
+
+      const heading =
+        `${makeSel.options[makeSel.selectedIndex].text} ` +
+        `${modelSel.options[modelSel.selectedIndex].text} ` +
+        `${yearSel.options[yearSel.selectedIndex].text}`;
+
+      // ensure folder public (safe no-op)
+      if (google.script.run.ensureFolderPublic) {
+        google.script.run.ensureFolderPublic(yearId);
+      }
+
+      // set bottom actions
+      const folderUrl = 'https://drive.google.com/drive/folders/' + yearId + '?usp=sharing';
+      toolbar.style.display = 'block';
+      shareAllBtn.href = 'https://wa.me/?text=' + encodeURIComponent(heading + '\n' + folderUrl);
+      emailAllBtn.href = 'mailto:?subject=' + encodeURIComponent(heading) + '&body=' + encodeURIComponent(folderUrl);
+      copyLinkBtn.onclick = () => navigator.clipboard.writeText(folderUrl)
+        .then(()=>{ const old=selLabel.textContent; say('Link copied'); setTimeout(()=>say(old),1200); });
+
+      // load photos
+      say('Loading photos…');
+      google.script.run
+        .withSuccessHandler(items => { say(`Photos: ${items.length}`); render(items, heading); })
+        .withFailureHandler(e => say('listPhotos error: ' + e.message))
+        .listPhotos(makeId, modelId, yearId);
+
+      // PDF
+      pdfBtn.onclick = ()=>{
+        const done = setBusy(pdfBtn,'Making PDF…');
+        // back-end should return a file URL (or ID). Adjust if your signature differs.
+        google.script.run
+          .withSuccessHandler(url => {
+            done('📄 PDF');
+            try{ if(url) window.open(url,'_blank'); }catch(_){}
+          })
+          .withFailureHandler(e => { done('📄 PDF'); alert('PDF error: ' + e.message); })
+          .makePdf(makeId, modelId, yearId);
+      };
+    });
+
+    window.addEventListener('load', boot);
   </script>
 </body>
 </html>
