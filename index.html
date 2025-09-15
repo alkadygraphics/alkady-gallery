@@ -19,6 +19,68 @@
                 border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px}
     .brand{height:22px}
     iframe{flex:1;border:0;width:100%;height:100%}
+<style>
+  :root{
+    --pad:12px; --gap:10px; --brand:#2563eb;
+    --radius:14px; --shadow:0 4px 16px rgba(0,0,0,.06);
+  }
+  html,body{height:100%;margin:0;background:#F4F6FA}
+  body{font:15px system-ui,-apple-system,Segoe UI,Roboto,Arial}
+
+  /* container */
+  .wrap{max-width:1100px;margin:0 auto;padding:var(--pad)}
+
+  /* sticky actions on mobile */
+  .toolbar{
+    display:flex;gap:8px;flex-wrap:wrap;
+    background:#fff;border-radius:var(--radius);
+    padding:8px; box-shadow:var(--shadow);
+  }
+  @media (max-width:640px){
+    .toolbar{
+      position:sticky; top:0; z-index:30;
+      padding:10px var(--pad); margin:0 calc(-1*var(--pad)) 10px;
+      border-radius:0;
+    }
+  }
+
+  /* filter row as grid */
+  .filters{
+    display:grid; gap:var(--gap);
+    grid-template-columns:1fr 1fr 1fr;
+    margin:10px 0;
+  }
+  @media (max-width:900px){ .filters{grid-template-columns:1fr 1fr;} }
+  @media (max-width:640px){ .filters{grid-template-columns:1fr;} }
+
+  select,.btn{
+    height:44px; border:1px solid #dbe2ea; background:#fff;
+    border-radius:12px; padding:0 12px; font-size:15px;
+  }
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; cursor:pointer}
+  .btn.primary{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .btn:disabled{opacity:.5; cursor:not-allowed}
+
+  /* list cards */
+  .card{
+    display:grid; grid-template-columns:80px 1fr auto; align-items:center;
+    gap:12px; padding:12px; margin:10px 0;
+    background:#fff; border-radius:18px; box-shadow:var(--shadow);
+  }
+  @media (max-width:640px){ .card{grid-template-columns:72px 1fr 84px;} }
+
+  .thumb{
+    width:72px;height:72px;border-radius:12px;object-fit:cover;background:#eef2f7
+  }
+  .title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sub{color:#6b7280;font-size:13px}
+  .viewBtn{min-width:80px}
+
+  /* small helper */
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid #cbd5e1;border-top-color:#2563eb;border-radius:50%;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
   </style>
 </head>
 <body>
